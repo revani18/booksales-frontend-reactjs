@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getBooks } from "../../../_services/books";
+import { deleteBook, getBooks } from "../../../_services/books";
 import { getGenres } from "../../../_services/genres";
 import { Link } from "react-router-dom";
 import { getAuthors } from "../../../_services/authors";
@@ -39,6 +39,26 @@ export default function AdminBooks() {
 
   const toggleDropdown = (id) => {
     setOpenDropdownId(openDropdownId === id ? null : id);
+  };
+
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure want to delete this book?",
+    );
+
+    if (confirmDelete) {
+      try {
+        await deleteBook(id);
+
+        setBooks((prevBooks) => prevBooks.filter((book) => book.id !== id));
+
+        setOpenDropdownId(null);
+        alert("Book berhasil dihapus!");
+      } catch (error) {
+        console.log("Error delete book:", error.response?.data || error);
+        alert("Gagal menghapus book!");
+      }
+    }
   };
 
   return (
@@ -96,7 +116,7 @@ export default function AdminBooks() {
                     d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
                   />
                 </svg>
-                Add product
+                Add Book
               </Link>
             </div>
           </div>
@@ -145,7 +165,9 @@ export default function AdminBooks() {
                       <td className="px-4 py-3">
                         {getGenreName(book.genre_id)}
                       </td>
-                      <td className="px-4 py-3">{getAuthorName(book.author_id)}</td>
+                      <td className="px-4 py-3">
+                        {getAuthorName(book.author_id)}
+                      </td>
 
                       <td className="px-4 py-3 text-right relative">
                         <button
@@ -187,6 +209,7 @@ export default function AdminBooks() {
 
                             <div className="py-1">
                               <button
+                                type="button"
                                 onClick={() => handleDelete(book.id)}
                                 className="block w-full text-right py-2 px-4 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600"
                               >

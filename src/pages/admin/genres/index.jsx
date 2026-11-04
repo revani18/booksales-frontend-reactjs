@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getGenres } from "../../../_services/genres";
+import { getGenres, deleteGenre } from "../../../_services/genres";
 import { Link } from "react-router-dom";
 
 export default function AdminGenres() {
@@ -19,14 +19,31 @@ export default function AdminGenres() {
     fetchData();
   }, []);
 
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure want to delete this genre?",
+    );
+
+    if (confirmDelete) {
+      try {
+        await deleteGenre(id);
+
+        setGenres(genres.filter((genre) => genre.id !== id));
+        alert("Genre berhasil dihapus!");
+      } catch (error) {
+        console.log(error);
+        alert("Error delete genre");
+      }
+    }
+  };
+
   const filteredGenres = genres.filter((genre) =>
-    genre.name.toLowerCase().includes(search.toLowerCase())
+    genre.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5">
       <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
-
         {/* Header */}
         <div className="flex flex-col md:flex-row items-center justify-between p-4 gap-4">
           <div>
@@ -51,7 +68,11 @@ export default function AdminGenres() {
               to="/admin/genres/create"
               className="flex items-center justify-center text-white bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-4 py-2.5 whitespace-nowrap"
             >
-              <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <svg
+                className="h-4 w-4 mr-2"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path
                   fillRule="evenodd"
                   d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
@@ -99,15 +120,16 @@ export default function AdminGenres() {
 
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-center gap-2">
-                        <button
-                          type="button"
+                        <Link
+                          to={`/admin/genres/edit/${genre.id}`}
                           className="text-blue-600 hover:text-blue-800 font-medium"
                         >
                           Edit
-                        </button>
+                        </Link>
 
                         <button
                           type="button"
+                          onClick={() => handleDelete(genre.id)}
                           className="text-red-600 hover:text-red-800 font-medium"
                         >
                           Delete
@@ -118,7 +140,10 @@ export default function AdminGenres() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
+                  <td
+                    colSpan="5"
+                    className="px-6 py-8 text-center text-gray-500"
+                  >
                     Data genre tidak ditemukan.
                   </td>
                 </tr>
@@ -136,11 +161,8 @@ export default function AdminGenres() {
             </span>
           </span>
 
-          <span className="text-xs text-gray-400">
-            Book Sales Admin
-          </span>
+          <span className="text-xs text-gray-400">Book Sales Admin</span>
         </div>
-
       </div>
     </section>
   );

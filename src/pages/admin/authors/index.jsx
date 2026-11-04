@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAuthors } from "../../../_services/authors";
+import { getAuthors, deleteAuthor } from "../../../_services/authors";
 import { Link } from "react-router-dom";
 
 export default function AdminAuthors() {
@@ -18,6 +18,28 @@ export default function AdminAuthors() {
 
     fetchData();
   }, []);
+
+  // Fungsi Delete Author
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure want to delete this author?",
+    );
+
+    if (confirmDelete) {
+      try {
+        await deleteAuthor(id);
+
+        setAuthors((prevAuthors) =>
+          prevAuthors.filter((author) => author.id !== id),
+        );
+
+        alert("Author berhasil dihapus!");
+      } catch (error) {
+        console.log(error);
+        alert("Error delete author");
+      }
+    }
+  };
 
   const filteredAuthors = authors.filter((author) =>
     author.name.toLowerCase().includes(search.toLowerCase()),
@@ -126,15 +148,16 @@ export default function AdminAuthors() {
 
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-center gap-2">
-                        <button
-                          type="button"
+                        <Link
+                          to={`/admin/authors/edit/${author.id}`}
                           className="text-blue-600 hover:text-blue-800 font-medium"
                         >
                           Edit
-                        </button>
+                        </Link>
 
                         <button
                           type="button"
+                          onClick={() => handleDelete(author.id)}
                           className="text-red-600 hover:text-red-800 font-medium"
                         >
                           Delete
