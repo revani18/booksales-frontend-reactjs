@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  showAuthor,
-  updateAuthor,
-} from "../../../_services/authors";
+import {showAuthor, updateAuthor } from "../../../_services/authors";
 
 export default function AuthorEdit() {
   const { id } = useParams();
