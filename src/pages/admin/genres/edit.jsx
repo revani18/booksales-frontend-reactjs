@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  showGenre,
-  updateGenre,
-} from "../../../_services/genres";
+import {showGenre,updateGenre,} from "../../../_services/genres";
 
 export default function GenreEdit() {
   const { id } = useParams();
