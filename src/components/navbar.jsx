@@ -1,6 +1,35 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { API } from "../_api";
 
 export default function Navbar() {
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+
+  const handleLogout = async () => {
+    const token = localStorage.getItem("accessToken");
+
+    try {
+      if (token) {
+        await API.post(
+          "/logout",
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("user");
+      delete API.defaults.headers.common["Authorization"];
+      navigate("/");
+    }
+  };
+
   return (
     <>
       <header>
@@ -18,19 +47,36 @@ export default function Navbar() {
             </Link>
 
             <div className="flex items-center lg:order-2">
-              <Link
-                to={"login"}
-                className="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800"
-              >
-                Masuk
-              </Link>
+              {user ? (
+                <>
+                  <span className="text-sm font-medium text-gray-700 dark:text-white mr-4">
+                    {user.role === "customer" ? user.name : "Admin"}
+                  </span>
 
-              <Link
-                to={"register"}
-                className="text-white bg-indigo-700 hover:bg-indigo-800 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:bg-indigo-600 dark:hover:bg-indigo-700 focus:outline-none dark:focus:ring-indigo-800"
-              >
-                Bergabung
-              </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-4 py-2"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="text-gray-800 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2"
+                  >
+                    Masuk
+                  </Link>
+
+                  <Link
+                    to="/register"
+                    className="text-white bg-indigo-700 hover:bg-indigo-800 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2"
+                  >
+                    Bergabung
+                  </Link>
+                </>
+              )}
 
               <button
                 data-collapse-toggle="mobile-menu-2"

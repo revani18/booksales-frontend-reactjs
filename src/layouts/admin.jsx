@@ -1,6 +1,50 @@
-import { Outlet, Link } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import { useDecodeToken } from "../_services/auth";
+import { useEffect } from "react";
+import { API } from "../_api";
 
 export default function AdminLayout() {
+  const navigate = useNavigate();
+
+  const token = localStorage.getItem("accessToken");
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+
+  const handleLogout = async () => {
+    const token = localStorage.getItem("accessToken");
+
+    try {
+      if (token) {
+        await API.post(
+          "/logout",
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("user");
+      delete API.defaults.headers.common["Authorization"];
+      navigate("/");
+    }
+  };
+
+  useEffect(() => {
+    if (!token || !user) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    if (user.role !== "admin") {
+      navigate("/", { replace: true });
+    }
+  }, [token, user?.role, navigate]);
+
   return (
     <>
       <div className="antialiased bg-gray-50 dark:bg-gray-900">
@@ -60,6 +104,9 @@ export default function AdminLayout() {
             </div>
 
             <div className="flex items-center lg:order-2">
+              <span className="text-sm font-medium text-gray-700 bg-gray-100 px-4 py-2 rounded-lg mr-3 dark:text-white dark:bg-gray-700">
+                Admin
+              </span>
               <button
                 type="button"
                 data-drawer-toggle="drawer-navigation"
@@ -292,6 +339,14 @@ export default function AdminLayout() {
                   </svg>
                   <span className="ml-3">Help</span>
                 </Link>
+              </li>
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center w-full p-2 text-base font-medium text-white bg-red-600 rounded-lg hover:bg-red-800 group transition-colors"
+                >
+                  <span className="ml-3">Logout</span>
+                </button>
               </li>
             </ul>
           </div>
