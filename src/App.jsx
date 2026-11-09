@@ -16,6 +16,8 @@ import BookEdit from "./pages/admin/books/edit";
 import ShowBook from "./pages/public/books/show";
 import GenreEdit from "./pages/admin/genres/edit";
 import AuthorEdit from "./pages/admin/authors/edit";
+import ProtectedRoute from "./components/ProtectedRoute";
+import GuestRoute from "./components/GuestRoute";
 
 function App() {
   return (
@@ -33,29 +35,33 @@ function App() {
           </Route>
 
           {/* Auth */}
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
+          <Route element={<GuestRoute />}>
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+          </Route>
 
           {/* Admin */}
-          <Route path="admin" element={<AdminLayout />}>
-            <Route index element={<Dashboard />} />
+          <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+            <Route path="admin" element={<AdminLayout />}>
+              <Route index element={<Dashboard />} />
 
-            <Route path="books">
-              <Route index element={<AdminBooks />} />
-              <Route path="create" element={<BookCreate />} />
-              <Route path="edit/:id" element={<BookEdit />} />
-            </Route>
+              <Route path="books">
+                <Route index element={<AdminBooks />} />
+                <Route path="create" element={<BookCreate />} />
+                <Route path="edit/:id" element={<BookEdit />} />
+              </Route>
 
-            <Route path="genres">
-              <Route index element={<AdminGenres />} />
-              <Route path="create" element={<GenreCreate />} />
-              <Route path="edit/:id" element={<GenreEdit />} />
-            </Route>
+              <Route path="genres">
+                <Route index element={<AdminGenres />} />
+                <Route path="create" element={<GenreCreate />} />
+                <Route path="edit/:id" element={<GenreEdit />} />
+              </Route>
 
-            <Route path="authors">
-              <Route index element={<AdminAuthors />} />
-              <Route path="create" element={<AuthorCreate />} />
-              <Route path="edit/:id" element={<AuthorEdit />} />
+              <Route path="authors">
+                <Route index element={<AdminAuthors />} />
+                <Route path="create" element={<AuthorCreate />} />
+                <Route path="edit/:id" element={<AuthorEdit />} />
+              </Route>
             </Route>
           </Route>
         </Routes>

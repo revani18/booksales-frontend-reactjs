@@ -1,31 +1,18 @@
 import { Link, useNavigate } from "react-router-dom";
-import { API } from "../_api";
+import { logout } from "../_services/auth";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "null");
 
   const handleLogout = async () => {
-    const token = localStorage.getItem("accessToken");
-
     try {
-      if (token) {
-        await API.post(
-          "/logout",
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-      }
+      await logout();
     } catch (error) {
       console.log(error);
     } finally {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("user");
-      delete API.defaults.headers.common["Authorization"];
       navigate("/");
     }
   };

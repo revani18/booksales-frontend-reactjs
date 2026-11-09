@@ -28,6 +28,11 @@ export const logout = async () => {
   } catch (error) {
     console.log(error);
     throw error;
+  } finally {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("user");
+
+    delete API.defaults.headers.common["Authorization"];
   }
 };
 
